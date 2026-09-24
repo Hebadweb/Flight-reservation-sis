@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Search Flights - Flight Booking System{% endblock %}
+
+{% block content %}
+<div class="text-center mb-4">
+    <h1><i class="fas fa-search"></i> Search Flights</h1>
+    <p class="lead">Find and book domestic flights across India</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-body">
+                <form method="GET" action="{{ url_for('flight_results') }}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="departure_city" class="form-label">
+                                    <i class="fas fa-plane-departure"></i> From
+                                </label>
+                                <select class="form-control" id="departure_city" name="departure_city" required>
+                                    <option value="">Select departure city</option>
+                                    {% for airport in airports %}
+                                        <option value="{{ airport.id }}">{{ airport.city }} - {{ airport.name }} ({{ airport.code }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="arrival_city" class="form-label">
+                                    <i class="fas fa-plane-arrival"></i> To
+                                </label>
+                                <select class="form-control" id="arrival_city" name="arrival_city" required>
+                                    <option value="">Select destination city</option>
+                                    {% for airport in airports %}
+                                        <option value="{{ airport.id }}">{{ airport.city }} - {{ airport.name }} ({{ airport.code }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="departure_date" class="form-label">
+                                    <i class="fas fa-calendar"></i> Departure Date
+                                </label>
+                                <input type="date" class="form-control" id="departure_date" name="departure_date" required>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">&nbsp;</label>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-search"></i> Search Flights
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="popular-routes mt-5">
+    <h3 class="text-center mb-4">Popular Routes</h3>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h6>Delhi ⇄ Mumbai</h6>
+                    <p class="text-muted">Most popular route</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h6>Mumbai ⇄ Bengaluru</h6>
+                    <p class="text-muted">Business hub connection</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <h6>Delhi ⇄ Goa</h6>
+                    <p class="text-muted">Weekend getaway</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Set minimum date to today
+    document.getElementById('departure_date').min = new Date().toISOString().split('T')[0];
+    
+    // Prevent selecting same departure and arrival cities
+    document.getElementById('departure_city').addEventListener('change', function() {
+        var arrivalSelect = document.getElementById('arrival_city');
+        var selectedValue = this.value;
+        
+        // Enable all options first
+        for (var i = 0; i < arrivalSelect.options.length; i++) {
+            arrivalSelect.options[i].disabled = false;
+        }
+        
+        // Disable the selected departure city in arrival dropdown
+        if (selectedValue) {
+            for (var i = 0; i < arrivalSelect.options.length; i++) {
+                if (arrivalSelect.options[i].value === selectedValue) {
+                    arrivalSelect.options[i].disabled = true;
+                    if (arrivalSelect.value === selectedValue) {
+                        arrivalSelect.value = '';
+                    }
+                    break;
+                }
+            }
+        }
+    });
+    
+    document.getElementById('arrival_city').addEventListener('change', function() {
+        var departureSelect = document.getElementById('departure_city');
+        var selectedValue = this.value;
+        
+        // Enable all options first
+        for (var i = 0; i < departureSelect.options.length; i++) {
+            departureSelect.options[i].disabled = false;
+        }
+        
+        // Disable the selected arrival city in departure dropdown
+        if (selectedValue) {
+            for (var i = 0; i < departureSelect.options.length; i++) {
+                if (departureSelect.options[i].value === selectedValue) {
+                    departureSelect.options[i].disabled = true;
+                    if (departureSelect.value === selectedValue) {
+                        departureSelect.value = '';
+                    }
+                    break;
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

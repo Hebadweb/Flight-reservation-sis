@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Cancellation Requests - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-ban"></i> Cancellation Requests</h1>
+</div>
+
+<!-- Cancellation Requests Table -->
+<div class="card">
+    <div class="card-body">
+        {% if cancellations %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Request Date</th>
+                            <th>User</th>
+                            <th>Booking Details</th>
+                            <th>Flight Info</th>
+                            <th>Passenger</th>
+                            <th>Seat</th>
+                            <th>Reason</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cancellation in cancellations %}
+                        <tr>
+                            <td>
+                                {{ cancellation.request_date[:16] }}<br>
+                                <small class="text-muted">Request ID: {{ cancellation.id }}</small>
+                            </td>
+                            <td>
+                                <strong>{{ cancellation.username }}</strong>
+                            </td>
+                            <td>
+                                <strong>{{ cancellation.booking_id }}</strong><br>
+                                <small class="text-muted">Booking Date: {{ cancellation.booking_date[:10] }}</small>
+                            </td>
+                            <td>
+                                <strong>{{ cancellation.flight_number }}</strong> ({{ cancellation.airline }})<br>
+                                {{ cancellation.departure_city }} → {{ cancellation.arrival_city }}<br>
+                                <small class="text-muted">{{ cancellation.departure_date }}</small>
+                            </td>
+                            <td>
+                                <strong>{{ cancellation.passenger_name }}</strong><br>
+                                <small class="text-muted">{{ cancellation.passenger_email }}</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-info">{{ cancellation.seat_number }}</span>
+                            </td>
+                            <td>
+                                <div class="reason-text">
+                                    {{ cancellation.reason }}
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-{% if cancellation.status == 'approved' %}success{% elif cancellation.status == 'denied' %}danger{% else %}warning{% endif %}">
+                                    {{ cancellation.status|title }}
+                                </span>
+                                {% if cancellation.processed_date %}
+                                    <br><small class="text-muted">{{ cancellation.processed_date[:16] }}</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if cancellation.status == 'pending' %}
+                                    <a href="{{ url_for('process_cancellation', request_id=cancellation.id, action='approve') }}" 
+                                       class="btn btn-sm btn-success mb-1"
+                                       onclick="return confirm('Are you sure you want to approve this cancellation? This will free up the seat and mark the booking as cancelled.')">
+                                        <i class="fas fa-check"></i> Approve
+                                    </a>
+                                    <a href="{{ url_for('process_cancellation', request_id=cancellation.id, action='deny') }}" 
+                                       class="btn btn-sm btn-danger"
+                                       onclick="return confirm('Are you sure you want to deny this cancellation request?')">
+                                        <i class="fas fa-times"></i> Deny
+                                    </a>
+                                {% elif cancellation.status == 'approved' %}
+                                    <span class="text-success"><i class="fas fa-check-circle"></i> Approved</span>
+                                {% elif cancellation.status == 'denied' %}
+                                    <span class="text-danger"><i class="fas fa-times-circle"></i> Denied</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-ban fa-3x text-muted mb-3"></i>
+                <h5>No cancellation requests</h5>
+                <p class="text-muted">All cancellation requests will appear here</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+.reason-text {
+    max-width: 200px;
+    word-wrap: break-word;
+    font-size: 0.9rem;
+}
+</style>
+{% endblock %}

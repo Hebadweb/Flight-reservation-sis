@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Bookings - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-ticket-alt"></i> Manage Bookings</h1>
+</div>
+
+<!-- Bookings Table -->
+<div class="card">
+    <div class="card-body">
+        {% if bookings %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Booking ID</th>
+                            <th>User</th>
+                            <th>Flight Details</th>
+                            <th>Passenger Info</th>
+                            <th>Seat</th>
+                            <th>Amount</th>
+                            <th>Payment</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in bookings %}
+                        <tr>
+                            <td><strong>{{ booking.booking_id }}</strong></td>
+                            <td>{{ booking.username }}</td>
+                            <td>
+                                <strong>{{ booking.flight_number }}</strong> ({{ booking.airline }})<br>
+                                {{ booking.departure_city }} → {{ booking.arrival_city }}<br>
+                                <small class="text-muted">{{ booking.departure_date }}</small>
+                            </td>
+                            <td>
+                                <strong>{{ booking.passenger_name }}</strong><br>
+                                {{ booking.passenger_email }}<br>
+                                <small class="text-muted">{{ booking.passenger_phone }}</small>
+                            </td>
+                            <td><span class="badge bg-info">{{ booking.seat_number }}</span></td>
+                            <td>₹{{ "%.2f"|format(booking.amount) }}</td>
+                            <td>
+                                <span class="badge bg-{% if booking.payment_status == 'completed' %}success{% else %}warning{% endif %}">
+                                    {{ booking.payment_status|title }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-{% if booking.booking_status == 'approved' %}success{% elif booking.booking_status == 'pending' %}warning{% else %}danger{% endif %}">
+                                    {{ booking.booking_status|title }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if booking.booking_status == 'pending' and booking.payment_status == 'completed' %}
+                                    <a href="{{ url_for('approve_booking', booking_id=booking.id) }}" 
+                                       class="btn btn-sm btn-success mb-1">
+                                        <i class="fas fa-check"></i> Approve
+                                    </a>
+                                    <a href="{{ url_for('deny_booking', booking_id=booking.id) }}" 
+                                       class="btn btn-sm btn-danger"
+                                       onclick="return confirm('Are you sure you want to deny this booking?')">
+                                        <i class="fas fa-times"></i> Deny
+                                    </a>
+                                {% elif booking.booking_status == 'approved' %}
+                                    <span class="text-success"><i class="fas fa-check-circle"></i> Approved</span>
+                                {% elif booking.booking_status == 'denied' %}
+                                    <span class="text-danger"><i class="fas fa-times-circle"></i> Denied</span>
+                                {% else %}
+                                    <small class="text-muted">Awaiting payment</small>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-muted">No bookings found</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Flight Booking System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="fas fa-tachometer-alt"></i> Admin Dashboard</h1>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ total_flights }}</h4>
+                        <p>Active Flights</p>
+                    </div>
+                    <i class="fas fa-plane fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ total_bookings }}</h4>
+                        <p>Total Bookings</p>
+                    </div>
+                    <i class="fas fa-ticket-alt fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ pending_bookings }}</h4>
+                        <p>Pending Bookings</p>
+                    </div>
+                    <i class="fas fa-clock fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4>{{ total_airports }}</h4>
+                        <p>Airports</p>
+                    </div>
+                    <i class="fas fa-map-marker-alt fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-bolt"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <a href="{{ url_for('admin_flights') }}" class="btn btn-primary me-2">
+                    <i class="fas fa-plane"></i> Manage Flights
+                </a>
+                <a href="{{ url_for('admin_bookings') }}" class="btn btn-success me-2">
+                    <i class="fas fa-ticket-alt"></i> Manage Bookings
+                </a>
+                <a href="{{ url_for('admin_cancellations') }}" class="btn btn-warning me-2">
+                    <i class="fas fa-ban"></i> Cancellation Requests
+                </a>
+                <a href="{{ url_for('admin_airports') }}" class="btn btn-info">
+                    <i class="fas fa-map-marker-alt"></i> Manage Airports
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Bookings -->
+<div class="card">
+    <div class="card-header">
+        <h5><i class="fas fa-history"></i> Recent Bookings</h5>
+    </div>
+    <div class="card-body">
+        {% if recent_bookings %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Booking ID</th>
+                            <th>User</th>
+                            <th>Flight</th>
+                            <th>Route</th>
+                            <th>Seat</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in recent_bookings %}
+                        <tr>
+                            <td>{{ booking.booking_id }}</td>
+                            <td>{{ booking.username }}</td>
+                            <td>{{ booking.flight_number }} ({{ booking.airline }})</td>
+                            <td>{{ booking.departure_city }} → {{ booking.arrival_city }}</td>
+                            <td>{{ booking.seat_number }}</td>
+                            <td>
+                                <span class="badge bg-{% if booking.booking_status == 'approved' %}success{% elif booking.booking_status == 'pending' %}warning{% else %}danger{% endif %}">
+                                    {{ booking.booking_status|title }}
+                                </span>
+                            </td>
+                            <td>{{ booking.booking_date[:16] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-muted">No recent bookings</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

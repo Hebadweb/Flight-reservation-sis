@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}Payment - Flight Booking System{% endblock %}
+
+{% block content %}
+<div class="text-center mb-4">
+    <h1><i class="fas fa-credit-card"></i> Payment</h1>
+    <p class="lead">Complete your booking payment</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <!-- Booking Summary -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-receipt"></i> Booking Summary</h5>
+            </div>
+            <div class="card-body">
+                {% if is_group %}
+                    <h6>Group Booking Details</h6>
+                    <p class="mb-3">Group Booking ID: <strong>{{ group_booking_id }}</strong></p>
+                    
+                    {% for booking in bookings %}
+                        <div class="row mb-3 p-2 bg-light rounded">
+                            <div class="col-md-6">
+                                {% if loop.first %}
+                                    <h6>Flight Details</h6>
+                                    <p class="mb-1"><strong>{{ booking.flight_number }}</strong> - {{ booking.airline }}</p>
+                                    <p class="mb-1">{{ booking.departure_city }} → {{ booking.arrival_city }}</p>
+                                    <p class="mb-1">{{ booking.departure_date }} at {{ booking.departure_time }}</p>
+                                {% endif %}
+                                <p class="mb-0">Seat: <span class="badge bg-info">{{ booking.seat_number }}</span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Passenger {{ loop.index }}</h6>
+                                <p class="mb-1"><strong>{{ booking.passenger_name }}</strong></p>
+                                <p class="mb-1">{{ booking.passenger_email }}</p>
+                                <p class="mb-0">{{ booking.passenger_phone }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Total Passengers: {{ bookings|length }}</h6>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h4 class="text-primary">Total: ₹{{ "%.2f"|format(total_amount) }}</h4>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Flight Details</h6>
+                            <p class="mb-1"><strong>{{ booking.flight_number }}</strong> - {{ booking.airline }}</p>
+                            <p class="mb-1">{{ booking.departure_city }} → {{ booking.arrival_city }}</p>
+                            <p class="mb-1">{{ booking.departure_date }} at {{ booking.departure_time }}</p>
+                            <p class="mb-0">Seat: <span class="badge bg-info">{{ booking.seat_number }}</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Passenger Details</h6>
+                            <p class="mb-1"><strong>{{ booking.passenger_name }}</strong></p>
+                            <p class="mb-1">{{ booking.passenger_email }}</p>
+                            <p class="mb-0">{{ booking.passenger_phone }}</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Booking ID: {{ booking.booking_id }}</h6>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <h4 class="text-primary">Total: ₹{{ "%.2f"|format(booking.amount) }}</h4>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Payment Form -->
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-lock"></i> Secure Payment</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Demo Mode:</strong> This is a dummy payment system. Any payment details will be automatically approved.
+                </div>
+                
+                <form method="POST" action="{{ url_for('process_payment') }}" id="paymentForm">
+                    {% if is_group %}
+                        <input type="hidden" name="booking_id" value="{{ group_booking_id }}">
+                        <input type="hidden" name="is_group" value="true">
+                    {% else %}
+                        <input type="hidden" name="booking_id" value="{{ booking.booking_id }}">
+                        <input type="hidden" name="is_group" value="false">
+                    {% endif %}
+                    
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="card_number" class="form-label">Card Number</label>
+                                <input type="text" class="form-control" id="card_number" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="cvv" class="form-label">CVV</label>
+                                <input type="text" class="form-control" id="cvv" placeholder="123" maxlength="3" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="expiry_month" class="form-label">Expiry Month</label>
+                                <select class="form-control" id="expiry_month" required>
+                                    <option value="">Month</option>
+                                    {% for month in range(1, 13) %}
+                                        <option value="{{ month }}">{{ "%02d"|format(month) }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="expiry_year" class="form-label">Expiry Year</label>
+                                <select class="form-control" id="expiry_year" required>
+                                    <option value="">Year</option>
+                                    {% for year in range(2024, 2035) %}
+                                        <option value="{{ year }}">{{ year }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="cardholder_name" class="form-label">Cardholder Name</label>
+                        <input type="text" class="form-control" id="cardholder_name" 
+                               value="{% if is_group %}{{ bookings[0].passenger_name }}{% else %}{{ booking.passenger_name }}{% endif %}" required>
+                    </div>
+                    
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="terms" required>
+                        <label class="form-check-label" for="terms">
+                            I agree to the terms and conditions
+                        </label>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success btn-lg" id="payButton">
+                            <i class="fas fa-credit-card"></i> Pay ₹{% if is_group %}{{ "%.2f"|format(total_amount) }}{% else %}{{ "%.2f"|format(booking.amount) }}{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Security Notice -->
+        <div class="text-center mt-4">
+            <div class="d-inline-flex align-items-center text-muted">
+                <i class="fas fa-shield-alt me-2"></i>
+                <small>Your payment is secured with 256-bit SSL encryption</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Format card number input
+document.getElementById('card_number').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+    let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+    this.value = formattedValue;
+});
+
+// CVV input validation
+document.getElementById('cvv').addEventListener('input', function(e) {
+    this.value = this.value.replace(/[^0-9]/g, '');
+});
+
+// Payment form submission
+document.getElementById('paymentForm').addEventListener('submit', function(e) {
+    const payButton = document.getElementById('payButton');
+    payButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+    payButton.disabled = true;
+    
+    // Simulate processing time
+    setTimeout(() => {
+        // Form will submit normally
+    }, 1000);
+});
+</script>
+{% endblock %}

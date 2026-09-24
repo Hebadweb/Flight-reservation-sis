@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Flight Results - Flight Booking System{% endblock %}
+
+{% block content %}
+<div class="text-center mb-4">
+    <h1><i class="fas fa-plane"></i> Available Flights</h1>
+    <p class="lead">{{ departure_date }}</p>
+</div>
+
+{% if flights %}
+    <div class="row">
+        {% for flight in flights %}
+        <div class="col-md-12 mb-3">
+            <div class="card flight-card">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-2">
+                            <h5 class="mb-1">{{ flight.flight_number }}</h5>
+                            <small class="text-muted">{{ flight.airline }}</small>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <h6>{{ flight.departure_time }}</h6>
+                            <p class="mb-0">{{ flight.departure_city }}</p>
+                            <small class="text-muted">{{ flight.departure_airport[:30] }}...</small>
+                        </div>
+                        
+                        <div class="col-md-1 text-center">
+                            <i class="fas fa-plane text-primary"></i>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <h6>{{ flight.arrival_time }}</h6>
+                            <p class="mb-0">{{ flight.arrival_city }}</p>
+                            <small class="text-muted">{{ flight.arrival_airport[:30] }}...</small>
+                        </div>
+                        
+                        <div class="col-md-2 text-center">
+                            <h4 class="text-primary">₹{{ "%.0f"|format(flight.price) }}</h4>
+                            <small class="text-muted">{{ flight.available_seats }} seats left</small>
+                        </div>
+                        
+                        <div class="col-md-1 text-end">
+                            <a href="{{ url_for('select_seat', flight_id=flight.id) }}" class="btn btn-primary">
+                                <i class="fas fa-arrow-right"></i> Select
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+        <h5>No flights found</h5>
+        <p class="text-muted">Try searching with different criteria</p>
+        <a href="{{ url_for('search_flights') }}" class="btn btn-primary">
+            <i class="fas fa-search"></i> Search Again
+        </a>
+    </div>
+{% endif %}
+
+<div class="text-center mt-4">
+    <a href="{{ url_for('search_flights') }}" class="btn btn-outline-primary">
+        <i class="fas fa-arrow-left"></i> Back to Search
+    </a>
+</div>
+{% endblock %}

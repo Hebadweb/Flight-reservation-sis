@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Flight Booking System{% endblock %}
+
+{% block content %}
+<div class="hero-section text-center py-5 mb-5">
+    <div class="container">
+        <h1 class="display-4 text-primary mb-4">
+            <i class="fas fa-plane"></i> Welcome to SkyBooking India
+        </h1>
+        <p class="lead mb-4">Book domestic flights across India with ease</p>
+        
+        {% if not session.user_id %}
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg me-3">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                    <a href="{{ url_for('register') }}" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-user-plus"></i> Register
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            {% if session.user_type == 'admin' %}
+                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-tachometer-alt"></i> Go to Admin Dashboard
+                </a>
+            {% else %}
+                <a href="{{ url_for('search_flights') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-search"></i> Search Flights
+                </a>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-map-marked-alt fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">Wide Network</h5>
+                <p class="card-text">Connect to major cities across India with our extensive flight network.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-clock fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">24/7 Booking</h5>
+                <p class="card-text">Book your flights anytime, anywhere with our round-the-clock service.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-shield-alt fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">Secure Payments</h5>
+                <p class="card-text">Your transactions are safe and secure with our payment system.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="popular-destinations mt-5">
+    <h3 class="text-center mb-4">Popular Destinations</h3>
+    <div class="row">
+        <div class="col-md-3 mb-3">
+            <div class="destination-card">
+                <img src="https://images.unsplash.com/photo-1587474260584-136574528ed5?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200" class="card-img-top" alt="Delhi">
+                <div class="card-body">
+                    <h6 class="card-title">Delhi</h6>
+                    <p class="card-text small">Capital of India</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="destination-card">
+                <img src="https://images.unsplash.com/photo-1595658658481-d53d3f999875?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200" class="card-img-top" alt="Mumbai">
+                <div class="card-body">
+                    <h6 class="card-title">Mumbai</h6>
+                    <p class="card-text small">Financial Capital</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="destination-card">
+                <img src="https://images.unsplash.com/photo-1582510003544-4d00b7f74220?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200" class="card-img-top" alt="Bangalore">
+                <div class="card-body">
+                    <h6 class="card-title">Bengaluru</h6>
+                    <p class="card-text small">Silicon Valley of India</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="destination-card">
+                <img src="https://images.unsplash.com/photo-1582462809893-c2f9abb76131?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200" class="card-img-top" alt="Goa">
+                <div class="card-body">
+                    <h6 class="card-title">Goa</h6>
+                    <p class="card-text small">Beach Paradise</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
